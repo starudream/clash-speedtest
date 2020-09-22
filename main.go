@@ -72,7 +72,7 @@ func init() {
 func main() {
 	hp, hsp := util.ProxyGet()
 
-	util.ProxySet(config.Proxy, config.Proxy)
+	util.ProxySet("", "")
 
 	mode, err := client.GetConfigMode()
 	if err != nil {
@@ -143,6 +143,8 @@ func main() {
 
 		time.Sleep(time.Second)
 
+		util.ProxySet(config.Proxy, config.Proxy)
+
 		for j := 1; j <= MaxRetry; j++ {
 			data, err := fast.GetData()
 			if err != nil {
@@ -173,5 +175,7 @@ func main() {
 			logx.Infof("speedtest download: %.03f kb, took: %.03f s, speed: %.2f kb/s", kb, ti, kb/ti)
 			break
 		}
+
+		util.ProxySet("", "")
 	}
 }
