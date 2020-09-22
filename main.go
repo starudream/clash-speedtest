@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"sort"
 	"strings"
@@ -21,7 +22,19 @@ type Config struct {
 	Proxy   string `json:"proxy"`
 	Include string `json:"include,omitempty"`
 	Exclude string `json:"exclude,omitempty"`
+	Process bool   `json:"process"`
 	Help    bool   `json:"-"`
+}
+
+type Dashboard struct {
+	TotalBytes int64         `json:"total_bytes"`
+	TotalTime  time.Duration `json:"total_time"`
+	Nodes      []*Node       `json:"nodes"`
+}
+
+type Node struct {
+	Name  string `json:"name"`
+	Speed string `json:"speed"`
 }
 
 const (
@@ -42,6 +55,7 @@ func init() {
 	flag.StringVar(&config.Proxy, "proxy", "http://127.0.0.1:7890", "http proxy url")
 	flag.StringVar(&config.Include, "include", "", "filter nodes that include")
 	flag.StringVar(&config.Exclude, "exclude", "", "filter nodes that exclude")
+	flag.BoolVar(&config.Process, "process", false, "show speedtest process")
 	flag.BoolVar(&config.Help, "help", false, "instructions for use")
 	flag.Parse()
 
@@ -133,6 +147,8 @@ func main() {
 		logx.Warnf("speedtest attempts %d time(s)", i)
 	}
 
+	dashboard := &Dashboard{Nodes: []*Node{}}
+
 	for i := 0; i < len(names); i++ {
 		proxy := proxies.Proxies[names[i]]
 
@@ -164,7 +180,7 @@ func main() {
 
 			logx.Infof("speedtest node country: %s, city: %s", target.Location.Country, target.Location.City)
 
-			result, err := speedtest(target.URL, Timeout)
+			result, err := speedtest(target.URL, Timeout, config.Process)
 			if err != nil {
 				logx.WithField("err", err).Errorf("speedtest fail")
 				break
@@ -173,6 +189,11 @@ func main() {
 			kb := float64(result.TotalBytes) / 1024
 			ti := float64(result.TotalTime) / float64(time.Second)
 			logx.Infof("speedtest download: %d kb, took: %.03f s, speed: %.2f kb/s", int64(kb), ti, kb/ti)
+
+			dashboard.TotalBytes += result.TotalBytes
+			dashboard.TotalTime += result.TotalTime
+			dashboard.Nodes = append(dashboard.Nodes, &Node{Name: proxy.Name, Speed: fmt.Sprintf("%.2f kb/s", kb/ti)})
+
 			break
 		}
 

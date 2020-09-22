@@ -24,7 +24,7 @@ const (
 	Timeout = 30 * time.Second
 )
 
-func speedtest(url string, timeout time.Duration) (*Result, error) {
+func speedtest(url string, timeout time.Duration, process bool) (*Result, error) {
 	fmt.Printf("\n")
 	defer fmt.Printf("\n\n")
 
@@ -50,7 +50,9 @@ func speedtest(url string, timeout time.Duration) (*Result, error) {
 			bs := make([]byte, 1024)
 			n, err := resp.Body.Read(bs)
 			result.TotalBytes += int64(n)
-			fmt.Printf("\r  %.02f%% %dkb/%dkb", float64(result.TotalBytes)/float64(result.AllBytes)*100, result.TotalBytes/1024, result.AllBytes/1024)
+			if process {
+				fmt.Printf("\r  %.02f%% %dkb/%dkb", float64(result.TotalBytes)/float64(result.AllBytes)*100, result.TotalBytes/1024, result.AllBytes/1024)
+			}
 			if err != nil {
 				if err != io.EOF {
 					result.err = err
