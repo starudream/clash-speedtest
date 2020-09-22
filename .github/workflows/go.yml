@@ -1,0 +1,23 @@
+name: Go
+on:
+  - push
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache
+          key: ${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+      - name: Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+      - name: Build
+        run: |
+          export GOPATH=~/.cache
+          CGO_ENABLED=0 GO111MODULE=on go build -o ./build/clash-speedtest .

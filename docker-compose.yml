@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+
+  clash:
+    image: starudream/clash
+    volumes:
+      - /opt/docker/clash/config.yaml:/root/.config/clash/config.yaml
+
+  clash-speedtest:
+    image: starudream/clash-speedtest
+    depends_on:
+      - clash
+    command: -url http://clash:9090 -proxy http://clash:7890
