@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/starudream/clash-speedtest/util"
 )
 
 type Result struct {
@@ -32,7 +34,7 @@ func speedtest(url string, timeout time.Duration) (*Result, error) {
 		return nil, err
 	}
 
-	resp, err := (&http.Client{}).Do(req)
+	resp, err := (&http.Client{Transport: util.Transport()}).Do(req)
 	if err != nil {
 		return nil, err
 	}

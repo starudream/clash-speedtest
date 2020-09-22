@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/go-sdk/logx"
@@ -54,7 +55,7 @@ func HTTP(method, url string, headers map[string]string, body, data interface{})
 		}
 	}
 
-	resp, err := (&http.Client{Timeout: DefaultHTTPTimeout}).Do(req)
+	resp, err := (&http.Client{Transport: Transport(), Timeout: DefaultHTTPTimeout}).Do(req)
 	if err != nil {
 		return "", err
 	}
@@ -78,4 +79,13 @@ func HTTP(method, url string, headers map[string]string, body, data interface{})
 	}
 
 	return str, nil
+}
+
+func Transport() *http.Transport {
+	hp, _ := ProxyGet()
+	u, err := url.Parse(hp)
+	if err != nil {
+		logx.WithField("err", err).Fatalf("http: parse http proxy fail, %s", hp)
+	}
+	return &http.Transport{Proxy: http.ProxyURL(u)}
 }

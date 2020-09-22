@@ -72,6 +72,8 @@ func init() {
 func main() {
 	hp, hsp := util.ProxyGet()
 
+	util.ProxySet(config.Proxy, config.Proxy)
+
 	mode, err := client.GetConfigMode()
 	if err != nil {
 		logx.WithField("err", err).Fatal("get proxy mode fail")
@@ -138,8 +140,6 @@ func main() {
 		if err != nil {
 			logx.WithField("err", err).Fatalf("switch node fail")
 		}
-
-		util.ProxySet(config.Proxy, config.Proxy)
 
 		time.Sleep(time.Second)
 
