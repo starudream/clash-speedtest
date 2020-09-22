@@ -11,12 +11,13 @@ import (
 )
 
 type Result struct {
-	AllBytes   float64
-	TotalBytes float64
+	AllBytes   int64
+	TotalBytes int64
 	TotalTime  time.Duration
 
+	err error
+
 	finish chan bool
-	err    chan error
 }
 
 const (
@@ -24,8 +25,8 @@ const (
 )
 
 func speedtest(url string, timeout time.Duration) (*Result, error) {
-	fmt.Println()
-	defer fmt.Println()
+	fmt.Printf("\n")
+	defer fmt.Printf("\n\n")
 
 	begin := time.Now()
 
@@ -40,24 +41,23 @@ func speedtest(url string, timeout time.Duration) (*Result, error) {
 	}
 	defer resp.Body.Close()
 
-	result := &Result{}
+	result := &Result{finish: make(chan bool)}
 
-	i, _ := strconv.ParseInt(resp.Header.Get("Content-Length"), 10, 64)
-	result.AllBytes = float64(i)
+	result.AllBytes, _ = strconv.ParseInt(resp.Header.Get("Content-Length"), 10, 64)
 
 	go func() {
 		for {
-			bs := make([]byte, 100*1024)
+			bs := make([]byte, 1024)
 			n, err := resp.Body.Read(bs)
-			result.TotalBytes += float64(n)
-			fmt.Printf("\r  %.02f%% %.03fkb/%.03fkb", result.TotalBytes/result.AllBytes*100, result.TotalBytes/1024, result.AllBytes/1024)
+			result.TotalBytes += int64(n)
+			fmt.Printf("\r  %.02f%% %dkb/%dkb", float64(result.TotalBytes)/float64(result.AllBytes)*100, result.TotalBytes/1024, result.AllBytes/1024)
 			if err != nil {
 				if err != io.EOF {
-					result.err <- err
-					return
+					result.err = err
 				}
+				result.finish <- true
+				return
 			}
-			result.finish <- true
 		}
 	}()
 
@@ -66,15 +66,10 @@ func speedtest(url string, timeout time.Duration) (*Result, error) {
 	}
 
 	select {
-	case v := <-result.err:
-		fmt.Println()
-		return nil, v
 	case <-result.finish:
-		fmt.Println()
 		result.TotalTime = time.Now().Sub(begin)
-		return result, nil
+		return result, err
 	case <-time.After(timeout):
-		fmt.Println()
 		result.TotalTime = Timeout
 		return result, nil
 	}

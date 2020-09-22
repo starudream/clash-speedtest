@@ -170,9 +170,9 @@ func main() {
 				break
 			}
 
-			kb := result.TotalBytes / 1024
-			ti := float64(result.TotalTime / time.Second)
-			logx.Infof("speedtest download: %.03f kb, took: %.03f s, speed: %.2f kb/s", kb, ti, kb/ti)
+			kb := float64(result.TotalBytes) / 1024
+			ti := float64(result.TotalTime) / float64(time.Second)
+			logx.Infof("speedtest download: %d kb, took: %.03f s, speed: %.2f kb/s", int64(kb), ti, kb/ti)
 			break
 		}
 

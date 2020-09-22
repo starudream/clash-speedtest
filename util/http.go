@@ -83,6 +83,9 @@ func HTTP(method, url string, headers map[string]string, body, data interface{})
 
 func Transport() *http.Transport {
 	hp, _ := ProxyGet()
+	if hp == "" {
+		return &http.Transport{}
+	}
 	u, err := url.Parse(hp)
 	if err != nil {
 		logx.WithField("err", err).Fatalf("http: parse http proxy fail, %s", hp)
