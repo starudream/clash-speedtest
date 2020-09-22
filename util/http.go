@@ -82,13 +82,22 @@ func HTTP(method, url string, headers map[string]string, body, data interface{})
 }
 
 func Transport() *http.Transport {
-	hp, _ := ProxyGet()
-	if hp == "" {
-		return &http.Transport{}
+	hp, hsp := ProxyGet()
+	var hpu, hspu *url.URL
+	if hp != "" {
+		hpu, _ = url.Parse(hp)
 	}
-	u, err := url.Parse(hp)
-	if err != nil {
-		logx.WithField("err", err).Fatalf("http: parse http proxy fail, %s", hp)
+	if hsp != "" {
+		hspu, _ = url.Parse(hsp)
 	}
-	return &http.Transport{Proxy: http.ProxyURL(u)}
+	proxy := func(req *http.Request) (*url.URL, error) {
+		var u *url.URL
+		if req.URL.Scheme == "https" {
+			u = hspu
+		} else {
+			u = hpu
+		}
+		return u, nil
+	}
+	return &http.Transport{Proxy: proxy}
 }
