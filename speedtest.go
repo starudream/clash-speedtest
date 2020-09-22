@@ -18,7 +18,7 @@ type Result struct {
 }
 
 const (
-	Timeout = 10 * time.Second
+	Timeout = 30 * time.Second
 )
 
 func speedtest(url string, timeout time.Duration) (*Result, error) {
@@ -54,8 +54,8 @@ func speedtest(url string, timeout time.Duration) (*Result, error) {
 					result.err <- err
 					return
 				}
-				result.finish <- true
 			}
+			result.finish <- true
 		}
 	}()
 
