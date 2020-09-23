@@ -206,7 +206,7 @@ func main() {
 		util.ProxySet("", "")
 	}
 
-	logx.Infof("total bytes: %.02f kb, total time: %d s", float64(dashboard.TotalBytes)/1024/1024, int64(dashboard.TotalTime/time.Second))
+	logx.Infof("total bytes: %.02f mb, total time: %d s", float64(dashboard.TotalBytes)/1024/1024, int64(dashboard.TotalTime/time.Second))
 
 	format := fmt.Sprintf("-> %%%ds   %%15s", nameMaxLen)
 
