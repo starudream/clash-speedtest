@@ -21,12 +21,14 @@ type Result struct {
 }
 
 const (
-	Timeout = 30 * time.Second
+	SpeedTestTimeout = 30 * time.Second
 )
 
-func speedtest(url string, timeout time.Duration, process bool) (*Result, error) {
-	fmt.Printf("\n")
-	defer fmt.Printf("\n\n")
+func SpeedTest(url string, timeout time.Duration, process bool) (*Result, error) {
+	if process {
+		fmt.Printf("\n")
+		defer fmt.Printf("\n\n")
+	}
 
 	begin := time.Now()
 
@@ -63,8 +65,8 @@ func speedtest(url string, timeout time.Duration, process bool) (*Result, error)
 		}
 	}()
 
-	if timeout < Timeout {
-		timeout = Timeout
+	if timeout < SpeedTestTimeout {
+		timeout = SpeedTestTimeout
 	}
 
 	select {
@@ -72,7 +74,7 @@ func speedtest(url string, timeout time.Duration, process bool) (*Result, error)
 		result.TotalTime = time.Now().Sub(begin)
 		return result, err
 	case <-time.After(timeout):
-		result.TotalTime = Timeout
+		result.TotalTime = SpeedTestTimeout
 		return result, nil
 	}
 }

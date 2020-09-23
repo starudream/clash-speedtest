@@ -61,7 +61,7 @@ func GetData() (*Data, error) {
 
 	getURL := fmt.Sprintf("%s?https=%t&token=%s&urlCount=%d", URL, true, token, Count)
 
-	logx.Debugf("fast.com api url: %s", getURL)
+	logx.Debugf("[fast.com] %s", getURL)
 
 	body, err := util.HTTPGet(getURL, nil, nil)
 	if err != nil {
