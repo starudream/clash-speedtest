@@ -148,7 +148,7 @@ func main() {
 	}
 
 	retry := func(i int) {
-		time.Sleep(time.Duration(i) * time.Second)
+		time.Sleep(time.Second)
 		logx.Warnf("[speedtest] attempts %d time(s)", i)
 	}
 
@@ -165,6 +165,8 @@ func main() {
 		time.Sleep(time.Second)
 
 		util.ProxySet(config.Proxy, config.Proxy)
+
+		result, node := &Result{}, &Node{Name: proxy.Name}
 
 		for j := 1; j <= MaxRetry; j++ {
 			data, err := fast.GetData()
@@ -185,7 +187,7 @@ func main() {
 
 			logx.Infof("[%s] speedtest node country: %s, city: %s", proxy.Name, target.Location.Country, target.Location.City)
 
-			result, err := SpeedTest(target.URL, 0, config.Process)
+			result, err = SpeedTest(target.URL, 0, config.Process)
 			if err != nil {
 				logx.WithField("err", err).Errorf("[%s] speedtest fail", proxy.Name)
 				continue
@@ -195,15 +197,20 @@ func main() {
 			ti := float64(result.TotalTime) / float64(time.Second)
 			logx.Infof("[%s] speedtest download: %d kb, took: %.03f s, speed: %.2f kb/s", proxy.Name, int64(kb), ti, kb/ti)
 
-			dashboard.TotalBytes += result.TotalBytes
-			dashboard.TotalTime += result.TotalTime
-			dashboard.Nodes[i] = &Node{Name: proxy.Name, Speed: fmt.Sprintf("%.2f", kb/ti)}
+			node = &Node{Speed: fmt.Sprintf("%.2f", kb/ti)}
 
-			logx.Infof("[%s] speedtest done, %d/%d", proxy.Name, i+1, len(names))
 			break
 		}
 
 		util.ProxySet("", "")
+
+		if result != nil {
+			dashboard.TotalBytes += result.TotalBytes
+			dashboard.TotalTime += result.TotalTime
+		}
+		dashboard.Nodes[i] = node
+
+		logx.Infof("[%s] speedtest done, %d/%d", proxy.Name, i+1, len(names))
 	}
 
 	logx.Infof("total bytes: %.02f mb, total time: %d s", float64(dashboard.TotalBytes)/1024/1024, int64(dashboard.TotalTime/time.Second))
