@@ -20,11 +20,11 @@ type Result struct {
 	finish chan bool
 }
 
-const (
-	SpeedTestTimeout = 30 * time.Second
+var (
+	SpeedTestTimeout = time.Duration(config.Timeout) * time.Second
 )
 
-func SpeedTest(url string, timeout time.Duration, process bool) (*Result, error) {
+func SpeedTest(url string, process bool) (*Result, error) {
 	if process {
 		fmt.Printf("\n")
 		defer fmt.Printf("\n\n")
@@ -65,15 +65,11 @@ func SpeedTest(url string, timeout time.Duration, process bool) (*Result, error)
 		}
 	}()
 
-	if timeout < SpeedTestTimeout {
-		timeout = SpeedTestTimeout
-	}
-
 	select {
 	case <-result.finish:
 		result.TotalTime = time.Now().Sub(begin)
 		return result, err
-	case <-time.After(timeout):
+	case <-time.After(SpeedTestTimeout):
 		result.TotalTime = SpeedTestTimeout
 		return result, nil
 	}

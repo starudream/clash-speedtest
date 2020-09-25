@@ -22,6 +22,7 @@ type Config struct {
 	Proxy   string `json:"proxy"`
 	Include string `json:"include,omitempty"`
 	Exclude string `json:"exclude,omitempty"`
+	Timeout int64  `json:"timeout"` // seconds
 	Process bool   `json:"process"`
 	Help    bool   `json:"-"`
 }
@@ -53,6 +54,7 @@ func init() {
 	flag.StringVar(&config.Proxy, "proxy", "http://127.0.0.1:7890", "http proxy url")
 	flag.StringVar(&config.Include, "include", "", "filter nodes that include")
 	flag.StringVar(&config.Exclude, "exclude", "", "filter nodes that exclude")
+	flag.Int64Var(&config.Timeout, "timeout", 20, "set speedtest max timeout")
 	flag.BoolVar(&config.Process, "process", false, "show speedtest process")
 	flag.BoolVar(&config.Help, "help", false, "instructions for use")
 	flag.Parse()
@@ -79,6 +81,10 @@ func init() {
 	}
 
 	logx.Infof("[clash] %s", json.MustMarshal(version))
+
+	if config.Timeout < 10 {
+		config.Timeout = 10
+	}
 }
 
 func main() {
@@ -187,7 +193,7 @@ func main() {
 
 			logx.Infof("[%s] speedtest node country: %s, city: %s", proxy.Name, target.Location.Country, target.Location.City)
 
-			result, err = SpeedTest(target.URL, 0, config.Process)
+			result, err = SpeedTest(target.URL, config.Process)
 			if err != nil {
 				logx.WithField("err", err).Errorf("[%s] speedtest fail", proxy.Name)
 				continue
