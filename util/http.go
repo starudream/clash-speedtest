@@ -12,7 +12,7 @@ import (
 	"github.com/go-sdk/utilx/json"
 )
 
-const DefaultHTTPTimeout = 30 * time.Second
+const DefaultHTTPTimeout = 5 * time.Second
 
 func HTTPGet(url string, headers map[string]string, data interface{}) (str string, err error) {
 	return HTTP(http.MethodGet, url, headers, nil, data)
