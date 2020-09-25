@@ -166,7 +166,7 @@ func main() {
 
 		util.ProxySet(config.Proxy, config.Proxy)
 
-		result, node := &Result{}, &Node{Name: proxy.Name}
+		result, node := &Result{}, &Node{Name: proxy.Name, Speed: "0.00"}
 
 		for j := 1; j <= MaxRetry; j++ {
 			data, err := fast.GetData()
@@ -195,10 +195,8 @@ func main() {
 
 			kb := float64(result.TotalBytes) / 1024
 			ti := float64(result.TotalTime) / float64(time.Second)
-			logx.Infof("[%s] speedtest download: %d kb, took: %.03f s, speed: %.2f kb/s", proxy.Name, int64(kb), ti, kb/ti)
-
-			node = &Node{Speed: fmt.Sprintf("%.2f", kb/ti)}
-
+			logx.Infof("[%s] speedtest download: %d kb, took: %.03f s, speed: %.02f kb/s", proxy.Name, int64(kb), ti, kb/ti)
+			node.Speed = fmt.Sprintf("%.02f", kb/ti)
 			break
 		}
 
