@@ -6,7 +6,7 @@ NAME=$1
 
 echo -e "\033[34m[ Start '${NAME}' ]\033[0m"
 
-docker build -q -t "${USERNAME}"/"${NAME}":latest .
+docker build --force-rm --compress -t "${USERNAME}"/"${NAME}":latest .
 
 echo -e "\033[32m[ Login Docker Hub ]\033[0m"
 docker login -u "${USERNAME}" -p "${DOCKER_TOKEN}"
