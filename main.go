@@ -17,14 +17,14 @@ import (
 )
 
 type Config struct {
-	URL     string `json:"url"`
-	Secret  string `json:"secret"`
-	Proxy   string `json:"proxy"`
-	Include string `json:"include,omitempty"`
-	Exclude string `json:"exclude,omitempty"`
-	Timeout int64  `json:"timeout"` // seconds
-	Process bool   `json:"process"`
-	Help    bool   `json:"-"`
+	URL     string       `json:"url"`
+	Secret  string       `json:"secret"`
+	Proxy   string       `json:"proxy"`
+	Include stringsValue `json:"include,omitempty"`
+	Exclude stringsValue `json:"exclude,omitempty"`
+	Timeout int64        `json:"timeout"` // seconds
+	Process bool         `json:"process"`
+	Help    bool         `json:"-"`
 }
 
 type Dashboard struct {
@@ -52,10 +52,13 @@ func init() {
 	flag.StringVar(&config.URL, "url", "http://127.0.0.1:9090", "external controller url")
 	flag.StringVar(&config.Secret, "secret", "", "external controller secret")
 	flag.StringVar(&config.Proxy, "proxy", "http://127.0.0.1:7890", "http proxy url")
-	flag.StringVar(&config.Include, "include", "", "filter nodes that include")
-	flag.StringVar(&config.Exclude, "exclude", "", "filter nodes that exclude")
+
+	flag.Var(&config.Include, "include", "filter nodes that include")
+	flag.Var(&config.Exclude, "exclude", "filter nodes that exclude")
+
 	flag.Int64Var(&config.Timeout, "timeout", 20, "set speedtest max timeout")
 	flag.BoolVar(&config.Process, "process", false, "show speedtest process")
+
 	flag.BoolVar(&config.Help, "help", false, "instructions for use")
 	flag.Parse()
 
@@ -127,11 +130,19 @@ func main() {
 		default:
 			continue
 		}
-		if config.Include != "" && !strings.Contains(proxy.Name, config.Include) {
-			continue
+		if len(config.Include) > 0 {
+			for _, v := range config.Include {
+				if !strings.Contains(proxy.Name, v) {
+					continue
+				}
+			}
 		}
-		if config.Exclude != "" && strings.Contains(proxy.Name, config.Exclude) {
-			continue
+		if len(config.Exclude) > 0 {
+			for _, v := range config.Exclude {
+				if strings.Contains(proxy.Name, v) {
+					continue
+				}
+			}
 		}
 		names = append(names, proxy.Name)
 	}
@@ -151,11 +162,6 @@ func main() {
 		if nameMaxLen < nameLen {
 			nameMaxLen = nameLen
 		}
-	}
-
-	retry := func(i int) {
-		time.Sleep(time.Second)
-		logx.Warnf("[speedtest] attempts %d time(s)", i)
 	}
 
 	dashboard := &Dashboard{Nodes: make([]*Node, len(names))}
@@ -178,7 +184,8 @@ func main() {
 			data, err := fast.GetData()
 			if err != nil {
 				logx.WithField("err", err).Errorf("[fast.com] api fail")
-				retry(j)
+				logx.Warnf("[speedtest] attempts %d time(s)", i)
+				time.Sleep(time.Second)
 				continue
 			}
 
