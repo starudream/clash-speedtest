@@ -226,7 +226,7 @@ func main() {
 
 	logx.Infof("total bytes: %.02f mb, total time: %d s", float64(dashboard.TotalBytes)/1024/1024, int64(dashboard.TotalTime/time.Second))
 
-	format := fmt.Sprintf("-> %%%ds   %%15s", nameMaxLen)
+	format := fmt.Sprintf("-> %%-%ds   %%15s", nameMaxLen)
 
 	logx.Infof(format, "name", "speed (kb/s)")
 
