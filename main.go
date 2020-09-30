@@ -130,19 +130,11 @@ func main() {
 		default:
 			continue
 		}
-		if len(config.Include) > 0 {
-			for _, v := range config.Include {
-				if !strings.Contains(proxy.Name, v) {
-					continue
-				}
-			}
+		if len(config.Include) > 0 && !util.StringContains(proxy.Name, []string(config.Include)...) {
+			continue
 		}
-		if len(config.Exclude) > 0 {
-			for _, v := range config.Exclude {
-				if strings.Contains(proxy.Name, v) {
-					continue
-				}
-			}
+		if len(config.Exclude) > 0 && util.StringContains(proxy.Name, []string(config.Exclude)...) {
+			continue
 		}
 		names = append(names, proxy.Name)
 	}
