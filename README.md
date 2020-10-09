@@ -29,7 +29,7 @@ services:
     image: starudream/clash-speedtest
     depends_on:
       - clash
-    command: /clash-speedtest -url http://clash:9090 -proxy http://clash:7890
+    command: /clash-speedtest -url http://clash:9090 -proxy http://clash:7890 -timeout 10 -include 香港 -include 台湾
 ```
 
 ```bash
