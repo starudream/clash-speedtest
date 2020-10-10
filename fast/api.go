@@ -37,31 +37,37 @@ type DataLocation struct {
 	City    string `json:"city"`
 }
 
+var (
+	getURL = ""
+)
+
 func GetData() (*Data, error) {
-	htmlBody, err := util.HTTPGet("https://fast.com", nil, nil)
-	if err != nil {
-		return nil, err
+	if getURL == "" {
+		htmlBody, err := util.HTTPGet("https://fast.com", nil, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		js := regexp.MustCompile("app-.*\\.js").FindString(htmlBody)
+		if js == "" {
+			return nil, fmt.Errorf("not found app-*.js")
+		}
+
+		jsBody, err := util.HTTPGet("https://fast.com/"+js, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		token := regexp.MustCompile("token:\"[a-zA-Z]*\"").FindString(jsBody)
+		if len(token) <= 8 {
+			return nil, fmt.Errorf("not found token")
+		}
+		token = token[7 : len(token)-1]
+
+		getURL = fmt.Sprintf("%s?https=%t&token=%s&urlCount=%d", URL, true, token, Count)
+
+		logx.Debugf("[fast.com] %s", getURL)
 	}
-
-	js := regexp.MustCompile("app-.*\\.js").FindString(htmlBody)
-	if js == "" {
-		return nil, fmt.Errorf("not found app-*.js")
-	}
-
-	jsBody, err := util.HTTPGet("https://fast.com/"+js, nil, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	token := regexp.MustCompile("token:\"[a-zA-Z]*\"").FindString(jsBody)
-	if len(token) <= 8 {
-		return nil, fmt.Errorf("not found token")
-	}
-	token = token[7 : len(token)-1]
-
-	getURL := fmt.Sprintf("%s?https=%t&token=%s&urlCount=%d", URL, true, token, Count)
-
-	logx.Debugf("[fast.com] %s", getURL)
 
 	body, err := util.HTTPGet(getURL, nil, nil)
 	if err != nil {
