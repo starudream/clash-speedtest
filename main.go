@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/go-sdk/logx"
 	"github.com/go-sdk/utilx/json"
+	"github.com/olekukonko/tablewriter"
 
 	"github.com/starudream/clash-speedtest/clash"
 	"github.com/starudream/clash-speedtest/fast"
@@ -142,16 +144,9 @@ func main() {
 		logx.Fatal("[config] no nodes left, please change include and exclude arguments")
 	}
 
-	nameMaxLen := 30
-
 	logx.Infof("[speedtest] total nodes: %d", len(names))
 	for i := 0; i < len(names); i++ {
-		name := names[i]
-		logx.Infof("-> %s", name)
-		nameLen := len(name)
-		if nameMaxLen < nameLen {
-			nameMaxLen = nameLen
-		}
+		logx.Infof("-> %s", names[i])
 	}
 
 	dashboard := &Dashboard{Nodes: make([]*Node, len(names))}
@@ -216,11 +211,14 @@ func main() {
 
 	logx.Infof("total bytes: %.02f mb, total time: %d s", float64(dashboard.TotalBytes)/1024/1024, int64(dashboard.TotalTime/time.Second))
 
-	format := fmt.Sprintf("-> %%-%ds   %%15s", nameMaxLen)
-
-	logx.Infof(format, "name", "speed (kb/s)")
-
+	bb := &bytes.Buffer{}
+	writer := tablewriter.NewWriter(bb)
+	writer.SetAutoFormatHeaders(false)
+	writer.SetHeader([]string{"name", "speed(kb/s)"})
 	for i := 0; i < len(names); i++ {
-		logx.Infof(format, names[i], dashboard.Nodes[i].Speed)
+		node := dashboard.Nodes[i]
+		writer.Append([]string{node.Name, node.Speed})
 	}
+	writer.Render()
+	logx.Infof("\n%s", bb.String())
 }
