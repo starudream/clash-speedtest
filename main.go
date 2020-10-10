@@ -37,8 +37,8 @@ type Dashboard struct {
 }
 
 type Node struct {
-	Name  string `json:"name"`
-	Speed string `json:"speed"` // kb/s
+	Name  string  `json:"name"`
+	Speed float64 `json:"speed"` // kb/s
 }
 
 var (
@@ -163,7 +163,7 @@ func main() {
 
 		util.ProxySet(config.Proxy, config.Proxy)
 
-		result, node := &Result{}, &Node{Name: proxy.Name, Speed: "0.00"}
+		result, node := &Result{}, &Node{Name: proxy.Name}
 
 		for j := int64(1); j <= config.Retry; j++ {
 			data, err := fast.GetData()
@@ -194,7 +194,7 @@ func main() {
 			kb := float64(result.TotalBytes) / 1024
 			ti := float64(result.TotalTime) / float64(time.Second)
 			logx.Infof("[%s] speedtest download: %d kb, took: %.03f s, speed: %.02f kb/s", proxy.Name, int64(kb), ti, kb/ti)
-			node.Speed = fmt.Sprintf("%.02f", kb/ti)
+			node.Speed = kb / ti
 			break
 		}
 
@@ -215,10 +215,24 @@ func main() {
 	writer := tablewriter.NewWriter(bb)
 	writer.SetAutoFormatHeaders(false)
 	writer.SetHeader([]string{"name", "speed(kb/s)"})
+	writer.SetFooter([]string{"name", "speed(kb/s)"})
+	writer.SetColumnAlignment([]int{tablewriter.ALIGN_LEFT, tablewriter.ALIGN_RIGHT})
 	for i := 0; i < len(names); i++ {
-		node := dashboard.Nodes[i]
-		writer.Append([]string{node.Name, node.Speed})
+		node, color := dashboard.Nodes[i], tablewriter.FgGreenColor
+		if node.Speed < 1024 {
+			color = tablewriter.FgRedColor
+		} else if node.Speed < 3072 {
+			color = tablewriter.FgYellowColor
+		}
+		writer.Rich(
+			[]string{node.Name, fmt.Sprintf("%.02f", node.Speed)},
+			[]tablewriter.Colors{tablewriter.Color(tablewriter.Bold), tablewriter.Color(tablewriter.Bold, color)},
+		)
 	}
 	writer.Render()
-	logx.Infof("\n%s", bb.String())
+
+	ss := strings.Split(bb.String()[:bb.Len()-1], tablewriter.NEWLINE)
+	for i := 0; i < len(ss); i++ {
+		logx.Info(ss[i])
+	}
 }
