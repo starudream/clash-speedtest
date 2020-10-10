@@ -22,6 +22,7 @@ type Config struct {
 	Proxy   string       `json:"proxy"`
 	Include stringsValue `json:"include,omitempty"`
 	Exclude stringsValue `json:"exclude,omitempty"`
+	Retry   int64        `json:"retry"`
 	Timeout int64        `json:"timeout"` // seconds
 	Process bool         `json:"process"`
 	Help    bool         `json:"-"`
@@ -38,10 +39,6 @@ type Node struct {
 	Speed string `json:"speed"` // kb/s
 }
 
-const (
-	MaxRetry = 3
-)
-
 var (
 	config = &Config{}
 
@@ -56,7 +53,8 @@ func init() {
 	flag.Var(&config.Include, "include", "filter nodes that include")
 	flag.Var(&config.Exclude, "exclude", "filter nodes that exclude")
 
-	flag.Int64Var(&config.Timeout, "timeout", 20, "set speedtest max timeout")
+	flag.Int64Var(&config.Retry, "retry", 3, "set speedtest retry")
+	flag.Int64Var(&config.Timeout, "timeout", 20, "set speedtest timeout")
 	flag.BoolVar(&config.Process, "process", false, "show speedtest process")
 
 	flag.BoolVar(&config.Help, "help", false, "instructions for use")
@@ -172,11 +170,11 @@ func main() {
 
 		result, node := &Result{}, &Node{Name: proxy.Name, Speed: "0.00"}
 
-		for j := 1; j <= MaxRetry; j++ {
+		for j := int64(1); j <= config.Retry; j++ {
 			data, err := fast.GetData()
 			if err != nil {
 				logx.WithField("err", err).Errorf("[fast.com] api fail")
-				logx.Warnf("[speedtest] attempts %d time(s)", i)
+				logx.Warnf("[speedtest] attempts %d time(s)", j)
 				time.Sleep(time.Second)
 				continue
 			}
