@@ -97,6 +97,8 @@ func main() {
 
 	util.ProxySet("", "")
 
+	_, _ = fast.GetData()
+
 	mode, err := client.GetConfigMode()
 	if err != nil {
 		logx.WithField("err", err).Fatal("[clash] get proxy mode fail")
