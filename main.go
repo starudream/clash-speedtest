@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-ping/ping"
 	"github.com/go-sdk/logx"
 	"github.com/go-sdk/utilx/json"
 	"github.com/olekukonko/tablewriter"
@@ -39,7 +38,6 @@ type Dashboard struct {
 
 type Node struct {
 	Name  string  `json:"name"`
-	Ping  float64 `json:"ping"`  // ms
 	Speed float64 `json:"speed"` // kb/s
 }
 
@@ -130,7 +128,7 @@ func main() {
 	var names []string
 	for _, proxy := range proxies.Proxies {
 		switch proxy.Type {
-		case "Shadowsocks", "Vmess":
+		case "Shadowsocks", "ShadowsocksR", "Snell", "Socks5", "Http", "Vmess", "Trojan":
 		default:
 			continue
 		}
@@ -176,7 +174,7 @@ func main() {
 			dashboard.TotalTime += result.TotalTime
 		}
 
-		dashboard.Nodes[i] = &Node{Name: proxy.Name, Ping: 0, Speed: speed}
+		dashboard.Nodes[i] = &Node{Name: proxy.Name, Speed: speed}
 
 		logx.Infof("[%s] speedtest done, %d/%d", proxy.Name, i+1, len(names))
 	}
@@ -184,21 +182,6 @@ func main() {
 	logx.Infof("total bytes: %.02f mb, total time: %d s", float64(dashboard.TotalBytes)/1024/1024, int64(dashboard.TotalTime/time.Second))
 
 	Print(dashboard.Nodes)
-}
-
-func Ping(addr string) float64 {
-	pinger, err := ping.NewPinger(addr)
-	if err != nil {
-		return 0
-	}
-	pinger.Timeout = 5 * time.Second
-	pinger.Count = 3
-	err = pinger.Run()
-	if err != nil {
-		return 0
-	}
-	stats := pinger.Statistics()
-	return float64(stats.AvgRtt) / float64(time.Millisecond)
 }
 
 func Speed(proxy clash.Proxy) (result *Result, speed float64) {
