@@ -224,6 +224,7 @@ func Print(nodes []*Node) {
 	bb := &bytes.Buffer{}
 	writer := tablewriter.NewWriter(bb)
 	writer.SetAutoFormatHeaders(false)
+	writer.SetAutoWrapText(false)
 	writer.SetHeader([]string{"name", "speed(kb/s)"})
 	writer.SetFooter([]string{"name", "speed(kb/s)"})
 	writer.SetColumnAlignment([]int{tablewriter.ALIGN_LEFT, tablewriter.ALIGN_RIGHT})
