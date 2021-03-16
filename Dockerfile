@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine AS builder
+FROM starudream/golang AS builder
 
 WORKDIR /build
 
