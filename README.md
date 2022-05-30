@@ -39,9 +39,9 @@ docker pull starudream/clash-speedtest
 ```bash
 docker run --rm \
     --name clash-speedtest \
-    -e SCA_DEBUG=true \
-    -e SCA_URL=http://host.docker.internal:9090 \
-    -e SCA_PROXY=http://host.docker.internal:7890 \
+    -e SCS_DEBUG=true \
+    -e SCS_URL=http://host.docker.internal:9090 \
+    -e SCS_PROXY=http://host.docker.internal:7890 \
     starudream/clash-speedtest
 ```
 

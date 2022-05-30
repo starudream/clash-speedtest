@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  clash:
+    image: starudream/clash
+    volumes:
+      - /opt/docker/clash/config.yaml:/root/.config/clash/config.yaml:ro
+  clash-speedtest:
+    image: starudream/clash-speedtest
+    depends_on:
+      - clash
+    environment:
+      SCS_URL: http://clash:9090
+      SCS_PROXY: http://clash:7890
