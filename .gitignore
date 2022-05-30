@@ -1,0 +1,10 @@
+.idea
+
+bin
+dist
+
+*.yaml
+*.yml
+*.log
+
+result-*.txt
