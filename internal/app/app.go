@@ -21,6 +21,7 @@ var (
 	eg     *errgroup.Group
 
 	ss []S
+	fs []F
 )
 
 type S func(ctx context.Context) error
@@ -29,6 +30,14 @@ func Add(s S) {
 	mu.Lock()
 	defer mu.Unlock()
 	ss = append(ss, s)
+}
+
+type F func()
+
+func Defer(f F) {
+	mu.Lock()
+	defer mu.Unlock()
+	fs = append(fs, f)
 }
 
 func Go() error {
@@ -50,37 +59,50 @@ func internalGo(once bool) error {
 	ctx, cancel = context.WithCancel(context.Background())
 	eg, ctx = errgroup.WithContext(ctx)
 
+	wg := sync.WaitGroup{}
+	wg.Add(len(ss))
+
+	doneCh := make(chan struct{}, 1)
+
+	if once {
+		go func() {
+			wg.Wait()
+			close(doneCh)
+		}()
+	}
+
 	errCh := make(chan error, 1)
+
 	for i := 0; i < len(ss); i++ {
 		s := ss[i]
-		if once {
-			eg.Go(func() error { return s(ctx) })
-		} else {
-			go func() { errCh <- s(ctx) }()
-		}
+		go func() {
+			defer wg.Done()
+			e := s(ctx)
+			if e != nil {
+				errCh <- e
+			}
+		}()
 	}
 
 	var err error
 
-	if !once {
-		ch := make(chan os.Signal, 1)
-		signal.Notify(ch, signals...)
+	signalCh := make(chan os.Signal, 1)
+	signal.Notify(signalCh, signals...)
 
-		eg.Go(func() error {
-			for {
-				select {
-				case err = <-errCh:
-					if err != nil {
-						Stop()
-					}
-				case <-ch:
-					Stop()
-				case <-ctx.Done():
-					return ctx.Err()
-				}
+	eg.Go(func() error {
+		for {
+			select {
+			case err = <-errCh:
+				Stop()
+			case <-doneCh:
+				Stop()
+			case <-signalCh:
+				Stop()
+			case <-ctx.Done():
+				return ctx.Err()
 			}
-		})
-	}
+		}
+	})
 
 	ege := eg.Wait()
 
@@ -100,6 +122,9 @@ func internalGo(once bool) error {
 
 func Stop() {
 	if cancel != nil {
+		for i := 0; i < len(fs); i++ {
+			fs[i]()
+		}
 		fmt.Println()
 		cancel()
 	}

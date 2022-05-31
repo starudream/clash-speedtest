@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/olekukonko/tablewriter"
@@ -20,7 +21,6 @@ import (
 	"github.com/starudream/clash-speedtest/download"
 	"github.com/starudream/clash-speedtest/internal/app"
 	"github.com/starudream/clash-speedtest/internal/ilog"
-	"github.com/starudream/clash-speedtest/internal/ios"
 )
 
 var rootCmd = &cobra.Command{
@@ -29,6 +29,7 @@ var rootCmd = &cobra.Command{
 	Version: config.FULL_VERSION,
 	Run: func(cmd *cobra.Command, args []string) {
 		app.Add(initSpeedtest)
+		app.Defer(deferSpeedtest)
 	},
 }
 
@@ -38,6 +39,12 @@ func Execute() {
 		os.Exit(1)
 	}
 }
+
+var (
+	smu     sync.Mutex
+	mode    clash.Mode
+	results []*download.Result
+)
 
 func initSpeedtest(context.Context) error {
 	clashCli := clash.New(viper.GetString("url"), viper.GetString("secret"))
@@ -50,12 +57,10 @@ func initSpeedtest(context.Context) error {
 
 	log.Info().Msgf("clash version: %s, premium: %t", version.Version, version.Premium)
 
-	mode, err := clashCli.GetMode()
+	mode, err = clashCli.GetMode()
 	if err != nil {
 		return err
 	}
-
-	defer func() { ilog.WrapError(clashCli.SetMode(mode)) }()
 
 	proxies, err := clashCli.GetProxies()
 	if err != nil {
@@ -125,7 +130,7 @@ func initSpeedtest(context.Context) error {
 		return nil
 	}
 
-	var results []*download.Result
+	defer deferSpeedtest()
 
 	for i := 0; i < len(names); i++ {
 		proxy := proxies[names[i]]
@@ -149,7 +154,9 @@ func initSpeedtest(context.Context) error {
 			result.Name = proxy.Name
 			result.Type = proxy.Type
 
+			smu.Lock()
 			results = append(results, result)
+			smu.Unlock()
 
 			l.Info().
 				IPAddr("ip", net.ParseIP(result.IP)).
@@ -164,13 +171,27 @@ func initSpeedtest(context.Context) error {
 		}
 	}
 
-	text := formatResult(results)
+	return nil
+}
 
-	fmt.Println(text)
-
-	filename := filepath.Join(ios.PWD(), fmt.Sprintf("result-%s.txt", time.Now().Format("20060102150405")))
-
-	return os.WriteFile(filename, []byte(text), 0644)
+func deferSpeedtest() {
+	func() {
+		smu.Lock()
+		defer smu.Unlock()
+		if len(results) > 0 {
+			text := formatResult(results)
+			fmt.Println(text)
+			filename := filepath.Join(viper.GetString("output"), fmt.Sprintf("result-%s.txt", time.Now().Format("20060102150405")))
+			ilog.WrapError(os.WriteFile(filename, []byte(text), 0644))
+			results = nil
+		}
+	}()
+	func() {
+		if mode != "" {
+			ilog.WrapError(clash.New(viper.GetString("url"), viper.GetString("secret")).SetMode(mode))
+			mode = ""
+		}
+	}()
 }
 
 func formatResult(results []*download.Result) string {

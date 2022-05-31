@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"strings"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 
 	"github.com/starudream/clash-speedtest/internal/ierr"
 	"github.com/starudream/clash-speedtest/internal/ilog"
+	"github.com/starudream/clash-speedtest/internal/ios"
 )
 
 func init() {
@@ -40,6 +42,9 @@ func init() {
 
 	rootCmd.PersistentFlags().DurationP("timeout", "", 5*time.Second, "(env: SCS_TIMEOUT) timeout for http request")
 	ierr.CheckErr(viper.BindPFlag("timeout", rootCmd.PersistentFlags().Lookup("timeout")))
+
+	rootCmd.PersistentFlags().StringP("output", "", "", "(env: SCS_OUTPUT) output directory")
+	ierr.CheckErr(viper.BindPFlag("output", rootCmd.PersistentFlags().Lookup("output")))
 }
 
 func initConfig() {
@@ -49,6 +54,15 @@ func initConfig() {
 
 	viper.SetDefault("debug", false)
 	viper.SetDefault("log.level", "INFO")
+
+	output := viper.GetString("output")
+	if output == "" {
+		output = ios.Executable()
+	}
+
+	ierr.CheckErr(os.MkdirAll(output, 0755))
+
+	viper.Set("output", output)
 
 	level, err := zerolog.ParseLevel(strings.ToLower(viper.GetString("log.level")))
 	if err != nil || level == zerolog.NoLevel {
@@ -69,6 +83,8 @@ func initConfig() {
 	}
 
 	zerolog.DefaultContextLogger = &log.Logger
+
+	log.Info().Msgf("output directory: %s", output)
 }
 
 func initLogger() {
