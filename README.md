@@ -18,6 +18,7 @@ Flags:
       --exclude strings    (env: SCS_EXCLUDE) filter nodes by exclude
   -h, --help               help for clash-speedtest
       --include strings    (env: SCS_INCLUDE) filter nodes by include
+      --output string      (env: SCS_OUTPUT) output directory
       --proxy string       (env: SCS_PROXY) clash http proxy url (default "http://127.0.0.1:7890")
       --retry int          (env: SCS_RETRY) retry times when failed (default 3)
       --secret string      (env: SCS_SECRET) clash external controller secret
