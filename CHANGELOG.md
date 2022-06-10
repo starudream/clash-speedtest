@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/starudream/clash-speedtest/compare/v1.0.0...v1.0.1) (2022-06-10)
+
+
+### Bug Fixes
+
+* fix release action ([7a5213c](https://github.com/starudream/clash-speedtest/commit/7a5213c4d8c0c84269b716ab5d8410e38aac6d72))
+
 ## [1.0.0](https://github.com/starudream/clash-speedtest/compare/v0.0.2...v1.0.0) (2022-06-10)
 
 
