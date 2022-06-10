@@ -1,21 +1,29 @@
 name: Release
 
-permissions:
-  contents: write
-
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - master
 
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
     steps:
+      - name: Prepare
+        uses: google-github-actions/release-please-action@v3
+        id: prepare
+        with:
+          token: ${{ secrets.PAT }}
+          release-type: go
+          bump-minor-pre-major: true
+          bump-patch-for-minor-pre-major: true
+          pull-request-title-pattern: "release: ${version}"
       - name: Checkout
+        if: ${{ steps.prepare.outputs.release_created }}
         uses: actions/checkout@v3
       - name: Cache
+        if: ${{ steps.prepare.outputs.release_created }}
         uses: actions/cache@v3
         with:
           path: |
@@ -23,17 +31,29 @@ jobs:
             ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
       - name: Go
+        if: ${{ steps.prepare.outputs.release_created }}
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
+      - name: Node
+        if: ${{ steps.prepare.outputs.release_created }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+          cache-dependency-path: "frontend/yarn.lock"
       - name: Build
+        if: ${{ steps.prepare.outputs.release_created }}
         run: |
           make -j releases
+          cd frontend && yarn install && yarn build && yarn generate && zip -r ../bin/frontend.zip dist && cd ..
           cd bin && sha256sum * > checksums.txt && cd ..
       - name: Upload
+        if: ${{ steps.prepare.outputs.release_created }}
         uses: softprops/action-gh-release@v1
         with:
+          token: ${{ secrets.PAT }}
           files: bin/*
-          draft: true
+          tag_name: ${{ steps.prepare.outputs.tag_name }}
           generate_release_notes: true
           fail_on_unmatched_files: true

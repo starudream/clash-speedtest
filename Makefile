@@ -1,7 +1,7 @@
 PROJECT ?= $(shell basename $(CURDIR))
-MODULE  ?= $(shell go list -m)
+MODULE 	?= $(shell go list -m)
 
-GO      ?= GO111MODULE=on go
+GO			?= GO111MODULE=on go
 VERSION ?= $(shell git describe --tags 2>/dev/null || echo "dev")
 BIDTIME ?= $(shell date +%FT%T%z)
 
@@ -42,11 +42,11 @@ zip_releases = $(addsuffix .zip, $(PLATFORMS))
 
 $(zip_releases): %.zip: %
 	@if test $(findstring windows, $@); then \
-  		zip -m -j bin/$(PROJECT)-$(basename $@)-$(VERSION).zip bin/$(PROJECT)-$(basename $@).exe; \
-  	else \
-  		chmod +x bin/$(PROJECT)-$(basename $@); \
-  	  	zip -m -j bin/$(PROJECT)-$(basename $@)-$(VERSION).zip bin/$(PROJECT)-$(basename $@); \
-  	fi
+		zip -m -j bin/$(PROJECT)-$(basename $@)-$(VERSION).zip bin/$(PROJECT)-$(basename $@).exe; \
+	else \
+		chmod +x bin/$(PROJECT)-$(basename $@); \
+		zip -m -j bin/$(PROJECT)-$(basename $@)-$(VERSION).zip bin/$(PROJECT)-$(basename $@); \
+	fi
 
 releases: clean $(zip_releases)
 

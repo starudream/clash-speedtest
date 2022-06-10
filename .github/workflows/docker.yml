@@ -1,14 +1,14 @@
 name: Docker
 
-permissions:
-  packages: write
-
 on:
   push:
     branches:
       - master
-    tags:
-      - 'v*'
+    paths-ignore:
+      - CHANGELOG.md
+  release:
+    types:
+      - published
 
 jobs:
   build:
@@ -37,7 +37,7 @@ jobs:
         with:
           registry: ghcr.io
           username: starudream
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.PAT }}
       - name: Docker Meta
         id: meta
         uses: docker/metadata-action@v4
