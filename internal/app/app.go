@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"runtime/debug"
 	"sync"
 	"syscall"
 
@@ -34,10 +35,10 @@ func Add(s S) {
 
 type F func()
 
-func Defer(f F) {
+func Recover(_fs ...F) {
 	mu.Lock()
 	defer mu.Unlock()
-	fs = append(fs, f)
+	fs = append(fs, _fs...)
 }
 
 func Go() error {
@@ -76,7 +77,13 @@ func internalGo(once bool) error {
 	for i := 0; i < len(ss); i++ {
 		s := ss[i]
 		go func() {
-			defer wg.Done()
+			defer func() {
+				wg.Done()
+				if re := recover(); re != nil {
+					fmt.Println(string(debug.Stack()))
+					Stop()
+				}
+			}()
 			e := s(ctx)
 			if e != nil {
 				errCh <- e
@@ -106,6 +113,10 @@ func internalGo(once bool) error {
 
 	ege := eg.Wait()
 
+	for i := len(fs) - 1; i >= 0; i-- {
+		fs[i]()
+	}
+
 	if err != nil {
 		return err
 	}
@@ -122,9 +133,6 @@ func internalGo(once bool) error {
 
 func Stop() {
 	if cancel != nil {
-		for i := 0; i < len(fs); i++ {
-			fs[i]()
-		}
 		fmt.Println()
 		cancel()
 	}

@@ -7,8 +7,6 @@ import (
 )
 
 func main() {
-	defer ierr.Recover(app.Stop)
-
 	cmd.Execute()
 
 	ierr.CheckErr(app.OnceGo())

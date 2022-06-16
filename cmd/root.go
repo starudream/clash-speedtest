@@ -29,7 +29,7 @@ var rootCmd = &cobra.Command{
 	Version: config.FULL_VERSION,
 	Run: func(cmd *cobra.Command, args []string) {
 		app.Add(initSpeedtest)
-		app.Defer(deferSpeedtest)
+		app.Recover(deferSpeedtest)
 	},
 }
 
