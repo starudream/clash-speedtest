@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/starudream/clash-speedtest/compare/v1.0.1...v1.0.2) (2022-06-16)
+
+
+### Performance Improvements
+
+* perfect app ([47cdd18](https://github.com/starudream/clash-speedtest/commit/47cdd182ceccd406c9154cdca79606b19857ce20))
+
 ## [1.0.1](https://github.com/starudream/clash-speedtest/compare/v1.0.0...v1.0.1) (2022-06-10)
 
 
