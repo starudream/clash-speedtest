@@ -9,6 +9,13 @@ services:
     image: starudream/clash-speedtest
     depends_on:
       - clash
+    volumes:
+      - /opt/docker/clash/result:/result
     environment:
-      SCS_URL: http://clash:9090
-      SCS_PROXY: http://clash:7890
+      URL: http://clash:9090
+      PROXY: http://clash:7890
+      RETRY: 1
+      TIMEOUT: 5s
+      INCLUDE:
+      EXCLUDE:
+      OUTPUT: /result

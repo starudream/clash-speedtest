@@ -1,10 +1,11 @@
-.idea
+# Jetbrains
+.idea/
 
-bin
-dist
+# Dist
+bin/
 
-*.yaml
-*.yml
-*.log
+# Config
+config.yaml
 
+# Dist
 result-*.txt

@@ -3,7 +3,7 @@ package clash
 import (
 	"fmt"
 
-	"github.com/starudream/clash-speedtest/internal/ihttp"
+	"github.com/starudream/go-lib/httpx"
 )
 
 const (
@@ -39,7 +39,7 @@ func (r *CommonResp) GetMessage() string {
 
 func do[T any](c *Client, method, path string, body any) (T, error) {
 	var result T
-	resp, err := ihttp.R().SetHeaders(c.headers).SetBody(body).SetResult(&result).SetError(&CommonResp{}).Execute(method, c.url+path)
+	resp, err := httpx.R().SetHeaders(c.headers).SetBody(body).SetResult(&result).SetError(&CommonResp{}).Execute(method, c.url+path)
 	if err != nil {
 		return result, err
 	}

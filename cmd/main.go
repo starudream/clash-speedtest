@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"bytes"
@@ -12,31 +12,24 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/rs/zerolog/log"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"github.com/starudream/go-lib/app"
+	"github.com/starudream/go-lib/config"
+	"github.com/starudream/go-lib/log"
 
 	"github.com/starudream/clash-speedtest/clash"
-	"github.com/starudream/clash-speedtest/config"
 	"github.com/starudream/clash-speedtest/download"
-	"github.com/starudream/clash-speedtest/internal/app"
-	"github.com/starudream/clash-speedtest/internal/ilog"
 )
 
-var rootCmd = &cobra.Command{
-	Use:     config.AppName,
-	Short:   config.AppName,
-	Version: config.FULL_VERSION,
-	Run: func(cmd *cobra.Command, args []string) {
-		app.Add(initSpeedtest)
-		app.Recover(deferSpeedtest)
-	},
+func init() {
+	log.Attach("app", "clash-speedtest")
 }
 
-func Execute() {
-	err := rootCmd.Execute()
+func main() {
+	app.Add(initSpeedtest)
+	app.Defer(deferSpeedtest)
+	err := app.OnceGo()
 	if err != nil {
-		os.Exit(1)
+		log.Fatal().Msgf("app init fail: %v", err)
 	}
 }
 
@@ -47,8 +40,8 @@ var (
 )
 
 func initSpeedtest(context.Context) error {
-	clashCli := clash.New(viper.GetString("url"), viper.GetString("secret"))
-	downloadCli := download.New(viper.GetString("proxy"), viper.GetDuration("timeout"))
+	clashCli := clash.New(config.GetString("url"), config.GetString("secret"))
+	downloadCli := download.New(config.GetString("proxy"), config.GetDuration("timeout"))
 
 	version, err := clashCli.GetVersion()
 	if err != nil {
@@ -78,9 +71,9 @@ func initSpeedtest(context.Context) error {
 	}
 
 	var (
-		include = viper.GetStringSlice("include")
-		exclude = viper.GetStringSlice("exclude")
-		retry   = viper.GetInt("retry")
+		include = config.GetStringSlice("include")
+		exclude = config.GetStringSlice("exclude")
+		retry   = config.GetInt("retry")
 	)
 
 	if retry <= 0 {
@@ -181,14 +174,17 @@ func deferSpeedtest() {
 		if len(results) > 0 {
 			text := formatResult(results)
 			fmt.Println(text)
-			filename := filepath.Join(viper.GetString("output"), fmt.Sprintf("result-%s.txt", time.Now().Format("20060102150405")))
-			ilog.WrapError(os.WriteFile(filename, []byte(text), 0644))
+			filename := filepath.Join(config.GetString("output"), fmt.Sprintf("result-%s.txt", time.Now().Format("20060102150405")))
+			err := os.WriteFile(filename, []byte(text), 0644)
+			if err != nil {
+				log.Fatal().Msgf("write file fail: %v", err)
+			}
 			results = nil
 		}
 	}()
 	func() {
 		if mode != "" {
-			ilog.WrapError(clash.New(viper.GetString("url"), viper.GetString("secret")).SetMode(mode))
+			_ = clash.New(config.GetString("url"), config.GetString("secret")).SetMode(mode)
 			mode = ""
 		}
 	}()
