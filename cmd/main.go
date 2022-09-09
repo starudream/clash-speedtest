@@ -22,6 +22,11 @@ import (
 
 func init() {
 	log.Attach("app", "clash-speedtest")
+
+	config.SetDefault("url", "http://127.0.0.1:9090")
+	config.SetDefault("proxy", "http://127.0.0.1:7890")
+	config.SetDefault("retry", 3)
+	config.SetDefault("timeout", "5s")
 }
 
 func main() {

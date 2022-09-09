@@ -7,25 +7,19 @@
 
 `Clash` 节点测速
 
-## Usage
+## Configure
 
-```
-Usage:
-  clash-speedtest [flags]
-
-Flags:
-      --debug              (env: SCS_DEBUG) show debug information
-      --exclude strings    (env: SCS_EXCLUDE) filter nodes by exclude
-  -h, --help               help for clash-speedtest
-      --include strings    (env: SCS_INCLUDE) filter nodes by include
-      --output string      (env: SCS_OUTPUT) output directory
-      --proxy string       (env: SCS_PROXY) clash http proxy url (default "http://127.0.0.1:7890")
-      --retry int          (env: SCS_RETRY) retry times when failed (default 3)
-      --secret string      (env: SCS_SECRET) clash external controller secret
-      --timeout duration   (env: SCS_TIMEOUT) timeout for http request (default 5s)
-      --url string         (env: SCS_URL) clash external controller url (default "http://127.0.0.1:9090")
-  -v, --version            version for clash-speedtest
-```
+| Variable | Type         | Default               | Description                      |
+|----------|--------------|-----------------------|----------------------------------|
+| DEBUG    | BOOL         | FALSE                 | show debug information           |
+| URL      | STRING       | http://127.0.0.1:9090 | clash external controller url    |
+| SECRET   | STRING       | -                     | clash external controller secret |
+| PROXY    | STRING       | http://127.0.0.1:7890 | configuration file path          |
+| TIMEOUT  | STRING       | 5s                    | timeout for http request         |
+| INCLUDE  | STRING ARRAY | -                     | filter nodes by include          |
+| EXCLUDE  | STRING ARRAY | -                     | filter nodes by exclude          |
+| RETRY    | INT          | 3                     | retry times when failed          |
+| OUTPUT   | STRING       | -                     | output directory                 |
 
 ### Docker
 
@@ -40,9 +34,9 @@ docker pull starudream/clash-speedtest
 ```bash
 docker run --rm \
     --name clash-speedtest \
-    -e SCS_DEBUG=true \
-    -e SCS_URL=http://host.docker.internal:9090 \
-    -e SCS_PROXY=http://host.docker.internal:7890 \
+    -e DEBUG=true \
+    -e URL=http://host.docker.internal:9090 \
+    -e PROXY=http://host.docker.internal:7890 \
     starudream/clash-speedtest
 ```
 
