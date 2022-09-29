@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/starudream/clash-speedtest/compare/v2.1.0...v2.1.1) (2022-09-29)
+
+
+### Bug Fixes
+
+* fix proxy type filter ([315572e](https://github.com/starudream/clash-speedtest/commit/315572ecadef4df46ccc32f62344ce471447caec))
+
 ## [2.1.0](https://github.com/starudream/clash-speedtest/compare/v2.0.0...v2.1.0) (2022-09-09)
 
 
