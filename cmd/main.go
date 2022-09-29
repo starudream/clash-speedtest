@@ -108,8 +108,8 @@ func initSpeedtest(context.Context) error {
 		}
 
 		switch proxy.Type {
-		case "Shadowsocks", "ShadowsocksR":
-		case "Direct", "Reject", "Selector", "URLTest":
+		case "Shadowsocks", "ShadowsocksR", "Snell", "Socks5", "Http", "Vmess", "Trojan":
+		case "Direct", "Reject", "Relay", "Selector", "Fallback", "URLTest", "LoadBalance":
 			continue
 		default:
 			l.Warn().Msgf("clash type %s not support", proxy.Type)
