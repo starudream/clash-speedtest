@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/starudream/clash-speedtest/compare/v2.1.1...v2.1.2) (2022-10-09)
+
+
+### Performance Improvements
+
+* perfect use go 1.19 ([87090e0](https://github.com/starudream/clash-speedtest/commit/87090e0cabefaa179ce83c7f3c36a6a4c2906fdb))
+
 ## [2.1.1](https://github.com/starudream/clash-speedtest/compare/v2.1.0...v2.1.1) (2022-09-29)
 
 
