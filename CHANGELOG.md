@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/starudream/clash-speedtest/compare/v2.1.2...v2.2.0) (2022-12-02)
+
+
+### Features
+
+* **deps:** bump dependencies ([4f06240](https://github.com/starudream/clash-speedtest/commit/4f06240db7ba8e5b1e0948aac32cb65918bdf596))
+
 ## [2.1.2](https://github.com/starudream/clash-speedtest/compare/v2.1.1...v2.1.2) (2022-10-09)
 
 
