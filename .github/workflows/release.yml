@@ -37,6 +37,8 @@ jobs:
           go-version: 1.19
       - name: Build
         if: ${{ steps.prepare.outputs.release_created }}
+        env:
+          VERSION: ${{ steps.prepare.outputs.tag_name }}
         run: |
           make -j releases
           cd bin && sha256sum * > checksums.txt && cd ..
