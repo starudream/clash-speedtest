@@ -1,9 +1,9 @@
 # Clash Speedtest
 
-![Golang](https://img.shields.io/github/workflow/status/starudream/clash-speedtest/Golang/master?label=Golang&style=for-the-badge)
-![Docker](https://img.shields.io/github/workflow/status/starudream/clash-speedtest/Docker/master?label=Docker&style=for-the-badge)
-![Release](https://img.shields.io/github/v/release/starudream/clash-speedtest?include_prereleases&style=for-the-badge)
-![License](https://img.shields.io/badge/License-Apache%20License%202.0-blue?style=for-the-badge)
+![Golang](https://img.shields.io/github/actions/workflow/status/starudream/clash-speedtest/golang.yml?label=golang&style=for-the-badge)
+![Docker](https://img.shields.io/github/actions/workflow/status/starudream/clash-speedtest/docker.yml?label=docker&style=for-the-badge)
+![Release](https://img.shields.io/github/v/release/starudream/clash-speedtest?include_prereleases&sort=semver&style=for-the-badge)
+![License](https://img.shields.io/badge/license-Apache--2.0-blue?style=for-the-badge)
 
 `Clash` 节点测速
 
@@ -23,8 +23,8 @@
 
 ### Docker
 
-![Version](https://img.shields.io/docker/v/starudream/clash-speedtest?style=for-the-badge)
-![Size](https://img.shields.io/docker/image-size/starudream/clash-speedtest/latest?style=for-the-badge)
+![Version](https://img.shields.io/docker/v/starudream/clash-speedtest?sort=semver&style=for-the-badge)
+![Size](https://img.shields.io/docker/image-size/starudream/clash-speedtest?sort=semver&style=for-the-badge)
 ![Pull](https://img.shields.io/docker/pulls/starudream/clash-speedtest?style=for-the-badge)
 
 ```bash
