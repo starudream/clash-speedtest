@@ -5,7 +5,7 @@ GO      ?= GO111MODULE=on go
 VERSION ?= $(shell git describe --tags 2>/dev/null || echo "dev")
 BIDTIME ?= $(shell date +%FT%T%z)
 
-BITTAGS := viper_logger
+BITTAGS :=
 LDFLAGS := -s -w
 LDFLAGS += -X "github.com/starudream/go-lib/constant.VERSION=$(VERSION)"
 LDFLAGS += -X "github.com/starudream/go-lib/constant.BIDTIME=$(BIDTIME)"
