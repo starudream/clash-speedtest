@@ -3,9 +3,10 @@
 
 # Dist
 bin/
+dist/
 
 # Config
 config.yaml
 
-# Dist
+# Result
 result-*.txt

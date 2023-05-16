@@ -15,27 +15,17 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
-          - macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Cache
-        uses: actions/cache@v3
         with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-      - name: Go
-        uses: actions/setup-go@v3
+          fetch-depth: 0
+      - name: Setup Go
+        uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: stable
       - name: Build
-        run: make bin
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          args: build --clean --snapshot

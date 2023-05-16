@@ -4,7 +4,7 @@ WORKDIR /build
 
 COPY . .
 
-RUN make bin && make upx
+RUN make clean && make bin && make upx
 
 FROM starudream/alpine-glibc:latest
 

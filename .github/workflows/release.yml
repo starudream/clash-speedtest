@@ -1,53 +1,29 @@
 name: Release
 
+permissions:
+  contents: write
+
 on:
   push:
-    branches:
-      - master
+    tags:
+      - '*'
 
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - name: Prepare
-        uses: google-github-actions/release-please-action@v3
-        id: prepare
-        with:
-          token: ${{ secrets.PAT }}
-          release-type: go
-          bump-minor-pre-major: true
-          bump-patch-for-minor-pre-major: true
-          pull-request-title-pattern: "release: ${version}"
       - name: Checkout
-        if: ${{ steps.prepare.outputs.release_created }}
         uses: actions/checkout@v3
-      - name: Cache
-        if: ${{ steps.prepare.outputs.release_created }}
-        uses: actions/cache@v3
         with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-      - name: Go
-        if: ${{ steps.prepare.outputs.release_created }}
-        uses: actions/setup-go@v3
+          fetch-depth: 0
+      - name: Setup Go
+        uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
-      - name: Build
-        if: ${{ steps.prepare.outputs.release_created }}
+          go-version: stable
+      - name: Release
+        uses: goreleaser/goreleaser-action@v4
         env:
-          VERSION: ${{ steps.prepare.outputs.tag_name }}
-        run: |
-          make -j releases
-          cd bin && sha256sum * > checksums.txt && cd ..
-      - name: Upload
-        if: ${{ steps.prepare.outputs.release_created }}
-        uses: softprops/action-gh-release@v1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          token: ${{ secrets.PAT }}
-          files: bin/*
-          tag_name: ${{ steps.prepare.outputs.tag_name }}
-          generate_release_notes: true
-          fail_on_unmatched_files: true
+          args: release --clean
