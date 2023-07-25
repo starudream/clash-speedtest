@@ -28,9 +28,6 @@ builds:
       - -X "github.com/starudream/go-lib/constant.NAME="
       - -X "github.com/starudream/go-lib/constant.PREFIX="
 
-upx:
-  - enabled: true
-
 archives:
   - format: tar.gz
     name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
