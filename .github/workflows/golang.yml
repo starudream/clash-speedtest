@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - CHANGELOG.md
   pull_request:
     branches:
       - master
@@ -17,15 +15,12 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Setup Go
-        uses: actions/setup-go@v4
+      - uses: actions/setup-go@v4
         with:
           go-version: stable
-      - name: Build
-        uses: goreleaser/goreleaser-action@v4
+      - uses: goreleaser/goreleaser-action@v4
         with:
           args: build --clean --snapshot

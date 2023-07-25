@@ -2,6 +2,7 @@ name: Release
 
 permissions:
   contents: write
+  packages: write
 
 on:
   push:
@@ -13,16 +14,25 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Setup Go
-        uses: actions/setup-go@v4
+      - uses: actions/setup-go@v4
         with:
           go-version: stable
-      - name: Release
-        uses: goreleaser/goreleaser-action@v4
+      - uses: docker/setup-qemu-action@v2
+        with:
+          platforms: all
+      - uses: docker/login-action@v2
+        with:
+          username: starudream
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: starudream
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: goreleaser/goreleaser-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

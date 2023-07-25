@@ -8,9 +8,6 @@ before:
 snapshot:
   name_template: "{{ .Version }}-next"
 
-#gomod:
-#  proxy: true
-
 report_sizes: true
 
 builds:
@@ -31,12 +28,73 @@ builds:
       - -X "github.com/starudream/go-lib/constant.NAME="
       - -X "github.com/starudream/go-lib/constant.PREFIX="
 
+upx:
+  - enabled: true
+
 archives:
   - format: tar.gz
     name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
         format: zip
+
+dockers:
+  - goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    use: buildx
+    image_templates:
+      - "starudream/{{ .ProjectName }}:latest-amd64"
+      - "starudream/{{ .ProjectName }}:{{ .Tag }}-amd64"
+      - "ghcr.io/starudream/{{ .ProjectName }}:latest-amd64"
+      - "ghcr.io/starudream/{{ .ProjectName }}:{{ .Tag }}-amd64"
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.source={{ .GitURL }}"
+      - "--label=org.opencontainers.image.url={{ .GitURL }}"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
+  - goos: linux
+    goarch: arm64
+    dockerfile: Dockerfile
+    use: buildx
+    image_templates:
+      - "starudream/{{ .ProjectName }}:latest-arm64"
+      - "starudream/{{ .ProjectName }}:{{ .Tag }}-arm64"
+      - "ghcr.io/starudream/{{ .ProjectName }}:latest-arm64"
+      - "ghcr.io/starudream/{{ .ProjectName }}:{{ .Tag }}-arm64"
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.source={{ .GitURL }}"
+      - "--label=org.opencontainers.image.url={{ .GitURL }}"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
+
+docker_manifests:
+  - name_template: "starudream/{{ .ProjectName }}:latest"
+    image_templates:
+      - "starudream/{{ .ProjectName }}:latest-amd64"
+      - "starudream/{{ .ProjectName }}:latest-arm64"
+  - name_template: "starudream/{{ .ProjectName }}:{{ .Tag }}"
+    image_templates:
+      - "starudream/{{ .ProjectName }}:{{ .Tag }}-amd64"
+      - "starudream/{{ .ProjectName }}:{{ .Tag }}-arm64"
+  - name_template: "ghcr.io/starudream/{{ .ProjectName }}:latest"
+    image_templates:
+      - "ghcr.io/starudream/{{ .ProjectName }}:latest-amd64"
+      - "ghcr.io/starudream/{{ .ProjectName }}:latest-arm64"
+  - name_template: "ghcr.io/starudream/{{ .ProjectName }}:{{ .Tag }}"
+    image_templates:
+      - "ghcr.io/starudream/{{ .ProjectName }}:{{ .Tag }}-amd64"
+      - "ghcr.io/starudream/{{ .ProjectName }}:{{ .Tag }}-arm64"
 
 checksum:
   name_template: "checksums.txt"

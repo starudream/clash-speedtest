@@ -1,15 +1,7 @@
-FROM starudream/golang AS builder
-
-WORKDIR /build
-
-COPY . .
-
-RUN make clean && make bin && make upx
-
-FROM starudream/alpine-glibc:latest
+FROM starudream/alpine
 
 WORKDIR /
 
-COPY --from=builder /build/bin/app /app
+COPY clash-speedtest /app
 
 CMD /app
