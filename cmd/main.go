@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -184,6 +185,14 @@ func deferSpeedtest() {
 			if err != nil {
 				log.Fatal().Msgf("write file fail: %v", err)
 			}
+			clashCli := clash.New(config.GetString("url"), config.GetString("secret"))
+			optimumNodeResult := results[0]
+			err = clashCli.SetProxy(optimumNodeResult.Name)
+			if err != nil {
+				log.Info().Msgf("Selected node: %s for online serfing🏄🏻, bandwidth: %s, latency: %dms, enjoy!", optimumNodeResult.Name, formatMeter(optimumNodeResult.BS), optimumNodeResult.ConnectDuration.Milliseconds())
+			} else {
+				log.Error().Msgf("Select node: %s error, reason: %s", optimumNodeResult.Name, err)
+			}
 			results = nil
 		}
 	}()
@@ -196,6 +205,9 @@ func deferSpeedtest() {
 }
 
 func formatResult(results []*download.Result) string {
+	sort.Slice(results, func(lhs, rhs int) bool {
+		return results[lhs].BS >= results[rhs].BS
+	})
 	bb := &bytes.Buffer{}
 	tw := tablewriter.NewWriter(bb)
 	tw.SetAlignment(tablewriter.ALIGN_CENTER)

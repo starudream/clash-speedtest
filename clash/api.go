@@ -60,6 +60,7 @@ func (c *Client) GetProxies() (map[string]*Proxy, error) {
 }
 
 func (c *Client) SetProxy(name string) error {
-	_, err := do[any](c, http.MethodPut, "/proxies/GLOBAL", fmt.Sprintf(`{"name":"%s"}`, name))
+	/// TODO: 改成配置文件下发的手动规则组
+	_, err := do[any](c, http.MethodPut, "/proxies/🚀 手动切换", fmt.Sprintf(`{"name":"%s"}`, name))
 	return err
 }
