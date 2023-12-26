@@ -47,8 +47,8 @@ func Download(req *resty.Request, url string, size int64, fn DownloadBodyFunc) (
 	}
 	res := &DownloadResult{
 		TotalSize: size,
-		ConnTime:  resp.Request.TraceInfo().ConnTime.Truncate(time.Millisecond),
-		RespTime:  time.Since(start).Truncate(time.Millisecond),
+		ConnTime:  resp.Request.TraceInfo().ConnTime,
+		RespTime:  time.Since(start),
 	}
 	return res, nil
 }
