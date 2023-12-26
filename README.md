@@ -21,6 +21,7 @@ Flags:
   -h, --help                  help for clash-speedtest
   -i, --includes strings      include proxy names
   -o, --output string         output file path (default "output")
+  -r, --size uint16           download size for each thread (default 20)
   -t, --threads uint16        download threads for each type, each thread will took 2MB traffic (default 3)
   -v, --version               version for clash-speedtest
 ```
@@ -37,6 +38,11 @@ Flags:
   > - `cloudflare` https://speed.cloudflare.com
   > - `speedtest` https://www.speedtest.net
   > - `fast` https://fast.com
+
+- `--size` `-r`
+  > 指定下载方式每个线程的下载大小
+  > - `cloudflare` `fast` 单位为 MB
+  > - `speedtest` 参考 https://github.com/starudream/clash-speedtest/blob/v3/api/speedtest/download.go
 
 - `--threads` `-t`
   > 指定下载方式的线程数，会同时下载多个文件，每个线程会消耗大约 2MB 流量
