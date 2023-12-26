@@ -26,6 +26,7 @@ type Task struct {
 	ClashSecret string `yaml:"clash.secret"`
 	ClashProxy  string `yaml:"clash.proxy"`
 
+	Size     int      `yaml:"size"`
 	Threads  int      `yaml:"threads"`
 	Download string   `yaml:"download"`
 	Includes []string `yaml:"includes"`
@@ -46,6 +47,10 @@ func Run() error {
 	err := config.Unmarshal("", t)
 	if err != nil {
 		return err
+	}
+
+	if t.Threads < 1 || t.Threads > 16 {
+		t.Threads = 2
 	}
 
 	err = t.Clash()

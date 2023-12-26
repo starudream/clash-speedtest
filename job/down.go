@@ -62,7 +62,7 @@ func (t *Task) downCloudflare(result *Result) (downFunc, error) {
 
 	fn := func(i int, bar *util.ProgressBar, wg *sync.WaitGroup) {
 		defer wg.Done()
-		res, err2 := cli.Download(t.progress(bar))
+		res, err2 := cli.Download(t.Size, t.progress(bar))
 		if err2 != nil {
 			slog.Error("cloudflare error: %v", err2)
 			return
@@ -93,7 +93,7 @@ func (t *Task) downSpeedtest(result *Result) (downFunc, error) {
 	fn := func(i int, bar *util.ProgressBar, wg *sync.WaitGroup) {
 		defer wg.Done()
 		server := servers[i%len(servers)]
-		res, err2 := cli.Download(server, t.progress(bar))
+		res, err2 := cli.Download(server, t.Size, t.progress(bar))
 		if err2 != nil {
 			slog.Error("speedtest error: %v", err2)
 			return
@@ -118,7 +118,7 @@ func (t *Task) downFast(result *Result) (downFunc, error) {
 	fn := func(i int, bar *util.ProgressBar, wg *sync.WaitGroup) {
 		defer wg.Done()
 		target := cfg.Targets[i%len(cfg.Targets)]
-		res, err2 := cli.Download(target, t.progress(bar))
+		res, err2 := cli.Download(target, t.Size, t.progress(bar))
 		if err2 != nil {
 			slog.Error("fast error: %v", err2)
 			return

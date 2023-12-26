@@ -15,6 +15,6 @@ func TestClient_Download(t *testing.T) {
 	server := servers[rand.Intn(len(servers))]
 	testutil.Log(t, server)
 
-	res, err := c.Download(server, nil)
+	res, err := c.Download(server, 0, nil)
 	testutil.LogNoErr(t, err, res.String())
 }

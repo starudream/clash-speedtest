@@ -6,8 +6,16 @@ import (
 	"github.com/starudream/clash-speedtest/api/common"
 )
 
-const size int64 = 2000000
+const (
+	miniSize    = 1 * 1e6
+	defaultSize = 4 * 1e6
+)
 
-func (c *Client) Download(fn common.DownloadBodyFunc) (*common.DownloadResult, error) {
-	return common.Download(c.c.R(), "https://speed.cloudflare.com/__down?bytes="+strconv.FormatInt(size, 10), size, fn)
+func (c *Client) Download(size int, fn common.DownloadBodyFunc) (*common.DownloadResult, error) {
+	size *= 1e6
+	if size <= miniSize {
+		size = defaultSize
+	}
+	url := "https://speed.cloudflare.com/__down?bytes=" + strconv.FormatInt(int64(size), 10)
+	return common.Download(c.c.R(), url, int64(size), fn)
 }

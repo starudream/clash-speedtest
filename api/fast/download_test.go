@@ -15,6 +15,6 @@ func TestClient_Download(t *testing.T) {
 	target := config.Targets[rand.Intn(len(config.Targets))]
 	testutil.Log(t, target)
 
-	res, err := c.Download(target, nil)
+	res, err := c.Download(target, 0, nil)
 	testutil.LogNoErr(t, err, res.String())
 }

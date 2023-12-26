@@ -14,8 +14,21 @@ import (
 // 3500 ~ 24.26 MB
 // 4000 ~ 31.63 MB
 
-const size = 1000 // ~ 2 MB
+const defaultSize = 1000 // ~ 2 MB
 
-func (c *Client) Download(s *Server, fn common.DownloadBodyFunc) (*common.DownloadResult, error) {
-	return common.Download(c.c.R(), s.BaseURL("random%dx%d.jpg", size, size), 0, fn)
+var availSizes = map[int]bool{
+	1000: true,
+	1500: true,
+	2000: true,
+	2500: true,
+	3000: true,
+	3500: true,
+	4000: true,
+}
+
+func (c *Client) Download(s *Server, size int, fn common.DownloadBodyFunc) (*common.DownloadResult, error) {
+	if !availSizes[size] {
+		size = defaultSize
+	}
+	return common.Download(c.c.R(), s.BaseURL("random%dx%d.jpg", defaultSize, defaultSize), 0, fn)
 }
