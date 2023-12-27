@@ -193,7 +193,7 @@ func (t *Task) Render() {
 			if !exists {
 				continue
 			}
-			conn := (res.total.ConnTime / time.Duration(res.threads)).Truncate(time.Millisecond)
+			conn := res.total.ConnTime / time.Duration(res.threads)
 			down := int64(float64(res.total.TotalSize) / res.total.RespTime.Seconds())
 			w.Rich(
 				[]string{proxy.Name, proxy.Type, res.Ip, res.Country, conn.String(), util.BytesSec(down)},
