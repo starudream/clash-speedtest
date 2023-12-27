@@ -133,7 +133,7 @@ func (t *Task) progress(bar *util.ProgressBar) common.DownloadBodyFunc {
 	return func(body io.ReadCloser, size int64) error {
 		defer bar.Finish()
 		bar.SetTotal(size)
-		_, err := io.ReadAll(bar.NewProxyReader(body))
+		_, err := io.Copy(io.Discard, bar.NewProxyReader(body))
 		return err
 	}
 }

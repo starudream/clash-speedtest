@@ -38,7 +38,7 @@ func Download(req *resty.Request, url string, size int64, fn DownloadBodyFunc) (
 	defer gh.Close(resp.RawBody())
 	start := time.Now()
 	if fn == nil {
-		_, err = io.ReadAll(resp.RawBody())
+		_, err = io.Copy(io.Discard, resp.RawBody())
 	} else {
 		err = fn(resp.RawBody(), size)
 	}
