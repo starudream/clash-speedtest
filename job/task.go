@@ -15,6 +15,7 @@ import (
 	"github.com/starudream/go-lib/core/v2/slog"
 	"github.com/starudream/go-lib/core/v2/utils/fmtutil"
 	"github.com/starudream/go-lib/core/v2/utils/maputil"
+	"github.com/starudream/go-lib/core/v2/utils/signalutil"
 	"github.com/starudream/go-lib/tablew/v2"
 
 	"github.com/starudream/clash-speedtest/api/clash"
@@ -87,11 +88,16 @@ func Run() error {
 	if err != nil {
 		return err
 	}
+	go func() {
+		<-signalutil.Defer(func() {
+			err = t.clash.SetMode(t.config.Mode)
+			if err != nil {
+				slog.Error("set mode error: %v", err)
+			}
+		}).Done()
+	}()
+
 	defer func(start time.Time) {
-		err = t.clash.SetMode(t.config.Mode)
-		if err != nil {
-			slog.Error("set mode error: %v", err)
-		}
 		slog.Info("took %s", time.Since(start).Truncate(time.Millisecond))
 	}(time.Now())
 
