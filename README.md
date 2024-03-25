@@ -30,6 +30,7 @@ Flags:
   > 默认使用 http://127.0.0.1:9090
 
 - `--clash-proxy`
+  > 通常为 http://127.0.0.1:7890  
   > 通过 `clash-addr` 的 `ip` + 接口 `/configs` 获取 `Port(http)` 或 `SocksPort(socks5)` 或 `MixedPort(http)`  
   > 如果配置了 `authentication` 需要手动指定 `--clash-secret http://user:pass@127.0.0.1:7890`
 
