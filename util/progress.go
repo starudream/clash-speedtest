@@ -2,11 +2,14 @@ package util
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/cheggaaa/pb/v3"
 
 	"github.com/starudream/go-lib/core/v2/slog"
+
+	"github.com/starudream/clash-speedtest/emoji"
 )
 
 type ProgressBar = pb.ProgressBar
@@ -20,7 +23,7 @@ func NewBarsPool(n int, name string) (*pb.Pool, []*pb.ProgressBar) {
 			SetRefreshRate(50*time.Millisecond).
 			SetTemplateString(tmpl).
 			Set(pb.SIBytesPrefix, true).
-			Set("prefix", fmt.Sprintf("%s [%d]", name, i+1))
+			Set("prefix", fmt.Sprintf("%s [%d]", strings.TrimSpace(emoji.Remove(name)), i+1))
 	}
 	pool, err := pb.StartPool(bars...)
 	if err != nil {

@@ -88,14 +88,15 @@ func Run() error {
 	if err != nil {
 		return err
 	}
-	go func() {
-		<-signalutil.Defer(func() {
-			err = t.clash.SetMode(t.config.Mode)
-			if err != nil {
-				slog.Error("set mode error: %v", err)
-			}
-		}).Done()
-	}()
+
+	reset := func() {
+		err = t.clash.SetMode(t.config.Mode)
+		if err != nil {
+			slog.Error("set mode error: %v", err)
+		}
+	}
+	go func() { signalutil.Defer(reset).Done() }()
+	defer func() { reset() }()
 
 	defer func(start time.Time) {
 		slog.Info("took %s", time.Since(start).Truncate(time.Millisecond))

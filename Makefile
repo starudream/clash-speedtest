@@ -18,3 +18,7 @@ bin: init
 .PHONY: run
 run: bin
 	DEBUG=true bin/$(PROJECT) $(ARGS)
+
+.PHONY: sync-emoji
+sync-emoji:
+	wget -O emoji/emoji.json https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json
