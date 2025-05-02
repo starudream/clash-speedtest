@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/samber/lo"
+
 	"github.com/starudream/go-lib/core/v2/config"
 	"github.com/starudream/go-lib/core/v2/slog"
 	"github.com/starudream/go-lib/core/v2/utils/fmtutil"
@@ -200,10 +202,10 @@ func (t *Task) Render() {
 			if !exists {
 				continue
 			}
-			conn := res.total.ConnTime / time.Duration(res.threads)
+			conn := (res.total.ConnTime / time.Duration(res.threads)).Truncate(time.Millisecond)
 			down := int64(float64(res.total.TotalSize) / res.total.RespTime.Seconds())
 			w.Rich(
-				[]string{proxy.Name, proxy.Type, res.Ip, res.Country, conn.String(), util.BytesSec(down)},
+				[]string{proxy.Name, proxy.Type, res.Ip, res.Country, lo.Ternary(conn < time.Millisecond, "<1ms", conn.String()), util.BytesSec(down)},
 				[]tablew.Colors{{tablew.Bold}, {}, {}, {}, {connColor(conn)}, {tablew.Bold, downColor(down)}},
 			)
 		}
